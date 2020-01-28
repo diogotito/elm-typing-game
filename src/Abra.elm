@@ -134,7 +134,7 @@ update_ msg model =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     Time.every 1000 Tick
 
 
@@ -175,6 +175,7 @@ view model =
         ]
 
 
+playerInput : Model -> Html Msg
 playerInput model =
     let
         placeholderText =
