@@ -5,6 +5,7 @@ import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Random
 import Time
 
 
@@ -12,12 +13,14 @@ import Time
 -- Config
 
 
+texts : Random.Generator String
 texts =
-    [ "The quick brown fox jumps over the lazy dog"
-    , "Grumpy wizards make toxic brew for the evil queen and jack."
-    , "Some painters transform the sun into a yellow spot, others transform a yellow spot into the sun."
-    , "What you guys are referring to as Linux, is in fact, GNU/Linux, or as I've recently taken to calling it, GNU plus Linux.\n"
-    ]
+    Random.uniform
+        "The quick brown fox jumps over the lazy dog"
+        [ "Grumpy wizards make toxic brew for the evil queen and jack."
+        , "Some painters transform the sun into a yellow spot, others transform a yellow spot into the sun."
+        , "What you guys are referring to as Linux, is in fact, GNU/Linux, or as I've recently taken to calling it, GNU plus Linux.\n"
+        ]
 
 
 
@@ -60,19 +63,14 @@ sentenceFinished { sentence, position } =
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { sentence =
-            texts
-                |> List.head
-                |> Maybe.withDefault ""
-                |> String.toList
-                |> Array.fromList
+    ( { sentence = Array.empty
       , position = 0
       , lastKey = Nothing
       , playerMadeMistake = False
       , errors = 0
       , time = 0
       }
-    , Cmd.none
+    , Random.generate NewText <| texts
     )
 
 
@@ -83,12 +81,19 @@ init _ =
 type Msg
     = Input String
     | Restart
+    | NewText String
     | Tick Time.Posix
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    ( update_ msg model, Cmd.none )
+    ( update_ msg model
+    , if msg == Restart then
+        Tuple.second (init ())
+
+      else
+        Cmd.none
+    )
 
 
 update_ : Msg -> Model -> Model
@@ -123,6 +128,9 @@ update_ msg model =
 
         Restart ->
             Tuple.first <| init ()
+
+        NewText text ->
+            { model | sentence = text |> String.toList |> Array.fromList }
 
 
 subscriptions : Model -> Sub Msg
