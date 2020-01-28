@@ -1,0 +1,90 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+@import url('https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono');
+
+body {
+  background-color: gray;
+  font-family: 'Roboto', 'Lucida Grande', 'Tahoma', sans-serif;
+  padding: 3em;
+}
+
+.typing-game {
+  padding: 1em 2em;
+  background-color: #F9F9F9;
+  color: #212121;
+  border-radius: 10px;
+}
+
+.text-to-type {
+  padding: 0.5em;
+  background-color: #FFCDD2;
+  border: 1px solid #212121;
+  border-radius: 5px;
+  margin-bottom: 1em;
+  font-family: 'Roboto Mono', 'Courier New', monospace;
+  font-size: large;
+}
+
+.text-to-type.finished {
+  background-color: transparent;
+}
+
+.letter {
+  margin: 0.2em;
+  line-height: 2em;
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+.letter.space {
+  display: inline-block;
+  width: 0.5em;
+  position: relative;
+  top: 0.6em;
+}
+
+.letter.highlighted {
+  background-color: #9E9E9E;
+}
+
+.text-to-type.errorAnim .letter.highlighted {
+  background-color: #F44336;
+  color: white;
+}
+
+.status {
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: justify;
+      justify-content: space-between;
+}
+
+.stopwatch {
+  display: inline-block;
+  width: 2em;
+  margin-left: 0.5em;
+  padding: 0.25em;
+  border: 1px solid #212121;
+  border-radius: 0.25em;
+  background-color: #FFCDD2;
+  text-align: center;
+}
+
+.disabled {
+  opacity: 0.75;
+  border-color: #757575;
+  color: #757575;
+}
+
+.text-to-type.disabled {
+  -webkit-transition: 1s;
+  -o-transition: 1s;
+  transition: 1s;
+}
+
+.stopwatch.disabled {
+  opacity: 1;
+  background-color: transparent;
+}
