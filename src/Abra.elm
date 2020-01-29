@@ -23,7 +23,7 @@ texts =
         "The quick brown fox jumps over the lazy dog"
         [ "Grumpy wizards make toxic brew for the evil queen and jack."
         , "Some painters transform the sun into a yellow spot, others transform a yellow spot into the sun."
-        , "What you guys are referring to as Linux, is in fact, GNU/Linux, or as I've recently taken to calling it, GNU plus Linux.\n"
+        , "What you guys are referring to as Linux, is in fact, GNU/Linux, or as I've recently taken to calling it, GNU plus Linux."
         ]
 
 
@@ -74,13 +74,7 @@ init _ =
       , errors = 0
       , time = 0
       }
-    , Cmd.batch
-        [ Random.generate NewText texts
-        , Task.attempt Focused
-            (Process.sleep 500
-                |> Task.andThen (\_ -> Browser.Dom.focus "player-input")
-            )
-        ]
+    , Random.generate NewText texts
     )
 
 
@@ -98,54 +92,52 @@ type Msg
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    ( update_ msg model
-    , if msg == Restart then
-        Tuple.second (init ())
-
-      else
-        Cmd.none
-    )
-
-
-update_ : Msg -> Model -> Model
-update_ msg model =
     case msg of
         Input text ->
             case List.head (String.toList text) of
                 Just key ->
                     if key == currentLetter model then
-                        { model
+                        ( { model
                             | position = model.position + 1
                             , playerMadeMistake = False
                             , lastKey = Just key
-                        }
+                          }
+                        , Cmd.none
+                        )
 
                     else
-                        { model
+                        ( { model
                             | playerMadeMistake = True
                             , errors = model.errors + 1
                             , lastKey = Just key
-                        }
+                          }
+                        , Cmd.none
+                        )
 
                 Nothing ->
-                    model
+                    ( model, Cmd.none )
 
         Tick _ ->
             if model.lastKey /= Nothing && not (sentenceFinished model) then
-                { model | time = model.time + 1 }
+                ( { model | time = model.time + 1 }, Cmd.none )
+
+            else if sentenceFinished model then
+                ( model, Task.attempt Focused <| Browser.Dom.focus "restart-button" )
 
             else
-                model
+                ( model, Cmd.none )
 
         Restart ->
-            Tuple.first <| init ()
+            init ()
 
         NewText text ->
-            { model | sentence = text |> String.toList |> Array.fromList }
+            ( { model | sentence = text |> String.toList |> Array.fromList }
+            , Task.attempt Focused <| Browser.Dom.focus "player-input"
+            )
 
         Focused result ->
             Debug.log (Debug.toString result)
-                model
+                ( model, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -224,7 +216,7 @@ playerInput model =
             []
 
     else
-        button [ id "reset-button", onClick Restart ] [ text "Restart" ]
+        button [ id "restart-button", onClick Restart ] [ text "Restart" ]
 
 
 letters : Model -> List (Html Msg)
