@@ -104,31 +104,37 @@ update msg model =
     in
     case msg of
         Input text ->
-            set <|
-                let
-                    key =
-                        List.head (String.toList text)
-                in
-                if key == currentLetter model then
-                    { model
-                        | position = model.position + 1
-                        , playerMadeMistake = False
-                        , lastKey = key
-                    }
+            let
+                key =
+                    List.head (String.toList text)
 
-                else
-                    { model
-                        | playerMadeMistake = True
-                        , errors = model.errors + 1
-                        , lastKey = key
-                    }
+                new_model =
+                    if key == currentLetter model then
+                        { model
+                            | position = model.position + 1
+                            , playerMadeMistake = False
+                            , lastKey = key
+                        }
+
+                    else
+                        { model
+                            | playerMadeMistake = True
+                            , errors = model.errors + 1
+                            , lastKey = key
+                        }
+
+                focus_restart =
+                    if sentenceFinished new_model then
+                        Task.attempt Focused <| Browser.Dom.focus "restart-button"
+
+                    else
+                        Cmd.none
+            in
+            ( new_model, focus_restart )
 
         Tick _ ->
             if model.lastKey /= Nothing && not (sentenceFinished model) then
                 set { model | time = model.time + 1 }
-
-            else if sentenceFinished model then
-                do <| Task.attempt Focused <| Browser.Dom.focus "restart-button"
 
             else
                 noop
