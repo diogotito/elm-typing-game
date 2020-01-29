@@ -91,16 +91,6 @@ type Msg
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    let
-        set new_model =
-            ( new_model, Cmd.none )
-
-        do cmd =
-            ( model, cmd )
-
-        noop =
-            ( model, Cmd.none )
-    in
     case msg of
         Input text ->
             let
@@ -135,7 +125,7 @@ update msg model =
             ( new_model, cmd )
 
         Tick _ ->
-            set { model | time = model.time + 1 }
+            ( { model | time = model.time + 1 }, Cmd.none )
 
         Restart ->
             init ()
@@ -146,7 +136,7 @@ update msg model =
             )
 
         Focused result ->
-            Debug.log (Debug.toString result) noop
+            Debug.log (Debug.toString result) ( model, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
