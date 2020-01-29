@@ -7,7 +7,6 @@ import Debug
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Process
 import Random
 import Task
 import Time
