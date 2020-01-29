@@ -2,10 +2,14 @@ module Abra exposing (Model, Msg(..), init, main, subscriptions, update, view)
 
 import Array exposing (Array)
 import Browser
+import Browser.Dom
+import Debug
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Process
 import Random
+import Task
 import Time
 
 
@@ -70,7 +74,13 @@ init _ =
       , errors = 0
       , time = 0
       }
-    , Random.generate NewText <| texts
+    , Cmd.batch
+        [ Random.generate NewText texts
+        , Task.attempt Focused
+            (Process.sleep 500
+                |> Task.andThen (\_ -> Browser.Dom.focus "player-input")
+            )
+        ]
     )
 
 
@@ -83,6 +93,7 @@ type Msg
     | Restart
     | NewText String
     | Tick Time.Posix
+    | Focused (Result Browser.Dom.Error ())
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -131,6 +142,10 @@ update_ msg model =
 
         NewText text ->
             { model | sentence = text |> String.toList |> Array.fromList }
+
+        Focused result ->
+            Debug.log (Debug.toString result)
+                model
 
 
 subscriptions : Model -> Sub Msg
@@ -204,12 +219,12 @@ playerInput model =
             , onInput Input
             , placeholder placeholderText
             , value ""
-            , autofocus True
+            , id "player-input"
             ]
             []
 
     else
-        button [ autofocus True, onClick Restart ] [ text "Restart" ]
+        button [ id "reset-button", onClick Restart ] [ text "Restart" ]
 
 
 letters : Model -> List (Html Msg)
