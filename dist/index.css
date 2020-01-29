@@ -92,17 +92,17 @@ body {
 @media only screen and (max-width: 500px) {
   body {
     padding: 0;
+    margin: 4px;
     background-color: #F9F9F9;
   }
 
-  .typing-game {
-
-  }
-
   .text-to-type {
-    margin-left: -3em;
-    margin-right: -3em;
-    padding-left: 3em;
-    padding-right: 3em;
+    margin-left: -2em;
+    margin-right: -2em;
+    padding-left: 2em;
+    padding-right: 2em;
+    border-left-width: 0;
+    border-right-width: 0;
+    border-radius: 0;
   }
 }
