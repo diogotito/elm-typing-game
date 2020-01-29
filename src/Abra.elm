@@ -220,6 +220,10 @@ playerInput model =
             , maxlength 1
             , onInput Input
             , placeholder placeholderText
+            , attribute "autocapitalize" "none"
+            , attribute "autocorrect" "off"
+            , autocomplete False
+            , spellcheck False
             , value ""
             , id "player-input"
             ]
