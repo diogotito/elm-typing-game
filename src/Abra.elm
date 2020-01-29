@@ -92,40 +92,47 @@ type Msg
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
+    let
+        set new_model =
+            ( new_model, Cmd.none )
+
+        do cmd =
+            ( model, cmd )
+
+        noop =
+            ( model, Cmd.none )
+    in
     case msg of
         Input text ->
-            case List.head (String.toList text) of
-                Just key ->
-                    if key == currentLetter model then
-                        ( { model
-                            | position = model.position + 1
-                            , playerMadeMistake = False
-                            , lastKey = Just key
-                          }
-                        , Cmd.none
-                        )
+            set <|
+                case List.head (String.toList text) of
+                    Just key ->
+                        if key == currentLetter model then
+                            { model
+                                | position = model.position + 1
+                                , playerMadeMistake = False
+                                , lastKey = Just key
+                            }
 
-                    else
-                        ( { model
-                            | playerMadeMistake = True
-                            , errors = model.errors + 1
-                            , lastKey = Just key
-                          }
-                        , Cmd.none
-                        )
+                        else
+                            { model
+                                | playerMadeMistake = True
+                                , errors = model.errors + 1
+                                , lastKey = Just key
+                            }
 
-                Nothing ->
-                    ( model, Cmd.none )
+                    Nothing ->
+                        model
 
         Tick _ ->
             if model.lastKey /= Nothing && not (sentenceFinished model) then
-                ( { model | time = model.time + 1 }, Cmd.none )
+                set { model | time = model.time + 1 }
 
             else if sentenceFinished model then
-                ( model, Task.attempt Focused <| Browser.Dom.focus "restart-button" )
+                do <| Task.attempt Focused <| Browser.Dom.focus "restart-button"
 
             else
-                ( model, Cmd.none )
+                noop
 
         Restart ->
             init ()
@@ -136,8 +143,7 @@ update msg model =
             )
 
         Focused result ->
-            Debug.log (Debug.toString result)
-                ( model, Cmd.none )
+            Debug.log (Debug.toString result) noop
 
 
 subscriptions : Model -> Sub Msg
