@@ -135,11 +135,7 @@ update msg model =
             ( new_model, cmd )
 
         Tick _ ->
-            if model.lastKey /= Nothing && not (sentenceFinished model) then
-                set { model | time = model.time + 1 }
-
-            else
-                noop
+            set { model | time = model.time + 1 }
 
         Restart ->
             init ()
@@ -154,8 +150,12 @@ update msg model =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions _ =
-    Time.every 1000 Tick
+subscriptions model =
+    if model.lastKey /= Nothing && not (sentenceFinished model) then
+        Time.every 1000 Tick
+
+    else
+        Sub.none
 
 
 
