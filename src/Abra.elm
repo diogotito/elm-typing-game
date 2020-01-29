@@ -122,14 +122,17 @@ update msg model =
                             , lastKey = key
                         }
 
-                focus_restart =
+                cmd =
                     if sentenceFinished new_model then
                         Task.attempt Focused <| Browser.Dom.focus "restart-button"
+
+                    else if key == Just '\\' then
+                        Task.perform (\_ -> Restart) (Task.succeed ())
 
                     else
                         Cmd.none
             in
-            ( new_model, focus_restart )
+            ( new_model, cmd )
 
         Tick _ ->
             if model.lastKey /= Nothing && not (sentenceFinished model) then
@@ -175,15 +178,22 @@ view model =
         , div [ class "status" ]
             [ div []
                 [ text <|
-                    "Number of errors: "
-                        ++ String.fromInt model.errors
+                    case model.errors of
+                        0 ->
+                            "No typos!"
+
+                        1 ->
+                            "1 typo"
+
+                        n ->
+                            String.fromInt n ++ " typos"
                 ]
             , div []
                 [ text "Time: "
                 , span
                     [ classList
                         [ ( "stopwatch", True )
-                        , ( "disabled", sentenceFinished model )
+                        , ( "disabled", model.lastKey == Nothing || sentenceFinished model )
                         ]
                     ]
                     [ text <| String.fromInt model.time ]
