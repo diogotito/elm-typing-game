@@ -55,9 +55,9 @@ type alias Model =
     }
 
 
-currentLetter : Model -> Char
+currentLetter : Model -> Maybe Char
 currentLetter { sentence, position } =
-    Maybe.withDefault '?' <| Array.get position sentence
+    Array.get position sentence
 
 
 sentenceFinished : Model -> Bool
@@ -105,24 +105,23 @@ update msg model =
     case msg of
         Input text ->
             set <|
-                case List.head (String.toList text) of
-                    Just key ->
-                        if key == currentLetter model then
-                            { model
-                                | position = model.position + 1
-                                , playerMadeMistake = False
-                                , lastKey = Just key
-                            }
+                let
+                    key =
+                        List.head (String.toList text)
+                in
+                if key == currentLetter model then
+                    { model
+                        | position = model.position + 1
+                        , playerMadeMistake = False
+                        , lastKey = key
+                    }
 
-                        else
-                            { model
-                                | playerMadeMistake = True
-                                , errors = model.errors + 1
-                                , lastKey = Just key
-                            }
-
-                    Nothing ->
-                        model
+                else
+                    { model
+                        | playerMadeMistake = True
+                        , errors = model.errors + 1
+                        , lastKey = key
+                    }
 
         Tick _ ->
             if model.lastKey /= Nothing && not (sentenceFinished model) then
