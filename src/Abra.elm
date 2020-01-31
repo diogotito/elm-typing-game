@@ -16,13 +16,13 @@ import Time
 -- Config
 
 
-texts : Random.Generator String
+texts : Random.Generator ( String, String )
 texts =
     Random.uniform
-        "The quick brown fox jumps over the lazy dog"
-        [ "Grumpy wizards make toxic brew for the evil queen and jack."
-        , "Some painters transform the sun into a yellow spot, others transform a yellow spot into the sun."
-        , "What you guys are referring to as Linux, is in fact, GNU/Linux, or as I've recently taken to calling it, GNU plus Linux."
+        ( "The quick brown fox jumps over the lazy dog", "I don't know" )
+        [ ( "Grumpy wizards make toxic brew for the evil queen and jack.", "Who knows" )
+        , ( "Some painters transform the sun into a yellow spot, others transform a yellow spot into the sun.", "Pablo Diego José Francisco de Paula Juan Nepomuceno María de los Remedios Cipriano de la Santísima Trinidad Ruiz y Picasso" )
+        , ( "What you guys are referring to as Linux, is in fact, GNU/Linux, or as I've recently taken to calling it, GNU plus Linux.", "Richard Stallman" )
         ]
 
 
@@ -46,6 +46,7 @@ main =
 
 type alias Model =
     { sentence : Array Char
+    , author : String
     , position : Int
     , lastKey : Maybe Char
     , playerMadeMistake : Bool
@@ -67,6 +68,7 @@ sentenceFinished { lastKey, sentence, position } =
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( { sentence = Array.empty
+      , author = ""
       , position = 0
       , lastKey = Nothing
       , playerMadeMistake = False
@@ -84,7 +86,7 @@ init _ =
 type Msg
     = Input String
     | Restart
-    | NewText String
+    | NewText ( String, String )
     | Tick Time.Posix
     | Focused (Result Browser.Dom.Error ())
 
@@ -130,8 +132,11 @@ update msg model =
         Restart ->
             init ()
 
-        NewText text ->
-            ( { model | sentence = text |> String.toList |> {- List.take 10 |> -} Array.fromList }
+        NewText ( sentence, author ) ->
+            ( { model
+                | sentence = sentence |> String.toList |> {- List.take 10 |> -} Array.fromList
+                , author = author
+              }
             , Task.attempt Focused <| Browser.Dom.focus "player-input"
             )
 
@@ -170,7 +175,7 @@ view model =
                 , ( "revealed", sentenceFinished model )
                 ]
             ]
-            [ div [ class "author" ] [ text "I don't know" ] ]
+            [ div [ class "author" ] [ text model.author ] ]
         , playerInput model
         , div [ class "status" ]
             [ div []
