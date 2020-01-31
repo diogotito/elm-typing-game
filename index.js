@@ -5422,12 +5422,16 @@ var $elm$random$Random$uniform = F2(
 	});
 var $author$project$Abra$texts = A2(
 	$elm$random$Random$uniform,
-	'The quick brown fox jumps over the lazy dog',
+	_Utils_Tuple2('The quick brown fox jumps over the lazy dog', 'I don\'t know'),
 	_List_fromArray(
-		['Grumpy wizards make toxic brew for the evil queen and jack.', 'Some painters transform the sun into a yellow spot, others transform a yellow spot into the sun.', 'What you guys are referring to as Linux, is in fact, GNU/Linux, or as I\'ve recently taken to calling it, GNU plus Linux.']));
+		[
+			_Utils_Tuple2('Grumpy wizards make toxic brew for the evil queen and jack.', 'Who knows'),
+			_Utils_Tuple2('Some painters transform the sun into a yellow spot, others transform a yellow spot into the sun.', 'Pablo Diego José Francisco de Paula Juan Nepomuceno María de los Remedios Cipriano de la Santísima Trinidad Ruiz y Picasso'),
+			_Utils_Tuple2('What you guys are referring to as Linux, is in fact, GNU/Linux, or as I\'ve recently taken to calling it, GNU plus Linux.', 'Richard Stallman')
+		]));
 var $author$project$Abra$init = function (_v0) {
 	return _Utils_Tuple2(
-		{errors: 0, lastKey: $elm$core$Maybe$Nothing, playerMadeMistake: false, position: 0, sentence: $elm$core$Array$empty, time: 0},
+		{author: '', errors: 0, lastKey: $elm$core$Maybe$Nothing, playerMadeMistake: false, position: 0, sentence: $elm$core$Array$empty, time: 0},
 		A2($elm$random$Random$generate, $author$project$Abra$NewText, $author$project$Abra$texts));
 };
 var $author$project$Abra$Tick = function (a) {
@@ -6008,13 +6012,16 @@ var $author$project$Abra$update = F2(
 			case 'Restart':
 				return $author$project$Abra$init(_Utils_Tuple0);
 			case 'NewText':
-				var text = msg.a;
+				var _v2 = msg.a;
+				var sentence = _v2.a;
+				var author = _v2.b;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
+							author: author,
 							sentence: $elm$core$Array$fromList(
-								$elm$core$String$toList(text))
+								$elm$core$String$toList(sentence))
 						}),
 					A2(
 						$elm$core$Task$attempt,
@@ -6291,7 +6298,7 @@ var $author$project$Abra$view = function (model) {
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text('I don\'t know')
+								$elm$html$Html$text(model.author)
 							]))
 					])),
 				$author$project$Abra$playerInput(model),
