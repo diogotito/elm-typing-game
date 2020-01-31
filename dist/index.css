@@ -47,6 +47,10 @@ body {
   top: 0.6em;
 }
 
+.text-to-type.disabled .letter.space.cleared {
+  display: inline;
+}
+
 .letter.highlighted {
   background-color: #aaaaaa;
   position: relative;
