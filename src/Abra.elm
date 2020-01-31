@@ -60,8 +60,8 @@ currentLetter { sentence, position } =
 
 
 sentenceFinished : Model -> Bool
-sentenceFinished { sentence, position } =
-    position == Array.length sentence
+sentenceFinished { lastKey, sentence, position } =
+    lastKey /= Nothing && position == Array.length sentence
 
 
 init : () -> ( Model, Cmd Msg )
@@ -131,7 +131,7 @@ update msg model =
             init ()
 
         NewText text ->
-            ( { model | sentence = text |> String.toList |> Array.fromList }
+            ( { model | sentence = text |> String.toList |> {- List.take 10 |> -} Array.fromList }
             , Task.attempt Focused <| Browser.Dom.focus "player-input"
             )
 
@@ -164,6 +164,13 @@ view model =
                 ]
             ]
             (letters model)
+        , div
+            [ classList
+                [ ( "author-wrapper", True )
+                , ( "revealed", sentenceFinished model )
+                ]
+            ]
+            [ div [ class "author" ] [ text "I don't know" ] ]
         , playerInput model
         , div [ class "status" ]
             [ div []
@@ -242,6 +249,7 @@ letters model =
                     [ classList
                         [ ( "letter", True )
                         , ( "highlighted", i == model.position )
+                        , ( "cleared", i < model.position )
                         , ( "space", c == ' ' )
                         ]
                     ]
